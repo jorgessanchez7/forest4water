@@ -8,7 +8,7 @@ class Forest4Water(TethysAppBase):
 
     name = 'Forest and Flow Variability'
     index = 'forest4water:home'
-    icon = 'forest4water/images/icon.gif'
+    icon = 'forest4water/images/f4r_logo.jpeg'
     package = 'forest4water'
     root_url = 'forest4water'
     color = '#197a43'
