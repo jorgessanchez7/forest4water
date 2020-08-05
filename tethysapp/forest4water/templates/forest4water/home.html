@@ -1,5 +1,11 @@
 {% extends "forest4water/base.html" %}
+
+{% load staticfiles %}
 {% load tethys_gizmos %}
+
+{% block import_gizmos %}
+    {% import_gizmo_dependency plotly_view %}
+{% endblock %}
 
 {% block header_buttons %}
   <div class="header-button glyphicon-button" data-toggle="tooltip" data-placement="bottom" title="Help">
@@ -16,7 +22,47 @@
 
 {# Use the after_app_content block for modals #}
 {% block after_app_content %}
-  <!-- Example Modal -->
+  <!----Observed Data ----->
+  <div class="modal fade" id="obsgraph" tabindex="-1" role="dialog" aria-labelledby="about-modal-label">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <div class="row">
+            <div id="station-info" class="col-md-8"></div>
+            <div class="col-md-4">
+              <div align="right">
+                <img class="obslogos" src="{% static 'forest4water/images/my-icon.png' %}">
+                <img class="obslogos" src="{% static 'forest4water/images/javeriana.png' %}">
+              </div>
+            </div>
+            <div id="interaction"></div>
+          </div>
+        </div>
+        <div class="modal-body">
+           <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a id="observedQ_tab_link" href="#observedQ" aria-controls="observedQ" role="tab" data-toggle="tab">Observed</a></li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="observedQ">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div class="flex-container-row"><img id="observed-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="observed-chart-Q"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div id="info" class="hidden"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+  <!-- About Modal -->
   <div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label">
     <div class="modal-dialog" role="document">
       <div class="modal-content">

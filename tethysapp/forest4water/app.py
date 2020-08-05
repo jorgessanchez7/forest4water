@@ -29,6 +29,11 @@ class Forest4Water(TethysAppBase):
                 url='forest4water',
                 controller='forest4water.controllers.home'
             ),
+            UrlMap(
+                name='get_discharge_data',
+                url='get-discharge-data',
+                controller='forest4water.controllers.get_discharge_data'
+            ),
         )
 
         return url_maps
