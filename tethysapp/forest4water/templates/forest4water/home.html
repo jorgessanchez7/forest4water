@@ -42,15 +42,23 @@
         <div class="modal-body">
            <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a id="observedQ_tab_link" href="#observedQ" aria-controls="observedQ" role="tab" data-toggle="tab">Observed</a></li>
+            <li role="presentation" class="active"><a id="observed_tab_link" href="#observed" aria-controls="observed" role="tab" data-toggle="tab">Observed</a></li>
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="observedQ">
+            <div role="tabpanel" class="tab-pane active" id="observed">
               <div class="panel panel-default">
                 <div class="panel-body">
                   <div class="flex-container-row"><img id="observed-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
                   <div id="observed-chart-Q"></div>
+                  <div class="flex-container-row"><img id="observed-loading-S" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="observed-chart-S"></div>
+                  <div class="flex-container-row"><img id="observed-loading-T" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="observed-chart-T"></div>
+                  <div class="flex-container-row"><img id="observed-loading-P" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="observed-chart-P"></div>
+                  <div class="flex-container-row"><img id="observed-loading-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="observed-chart-FC"></div>
                 </div>
               </div>
             </div>

@@ -34,6 +34,26 @@ class Forest4Water(TethysAppBase):
                 url='get-discharge-data',
                 controller='forest4water.controllers.get_discharge_data'
             ),
+            UrlMap(
+                name='get_sediments_data',
+                url='get-sediments-data',
+                controller='forest4water.controllers.get_sediments_data'
+            ),
+            UrlMap(
+                name='get_temperature_data',
+                url='get-temperature-data',
+                controller='forest4water.controllers.get_temperature_data'
+            ),
+            UrlMap(
+                name='get_precipitation_data',
+                url='get-precipitation-data',
+                controller='forest4water.controllers.get_precipitation_data'
+            ),
+            UrlMap(
+                name='get_forest_cover_data',
+                url='get-forest-cover-data',
+                controller='forest4water.controllers.get_forest_cover_data'
+            ),
         )
 
         return url_maps
