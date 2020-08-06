@@ -110,7 +110,7 @@ def get_sediments_data(request):
             x=dates,
             y=mean_sediments,
             name='Sediment Concentration',
-            line=dict(color='#00cc96')
+            line=dict(color='#8c564b')
         )
 
         layout = go.Layout(title='Mean Sediment Concentration at {0}-{1}'.format(nomEstacion, codEstacion),
