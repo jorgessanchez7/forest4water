@@ -43,6 +43,8 @@
            <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a id="observed_tab_link" href="#observed" aria-controls="observed" role="tab" data-toggle="tab">Observed</a></li>
+            <li role="presentation"><a id="monthlyAnalysis_tab_link" href="#monthlyAnalysis" aria-controls="monthlyAnalysis" role="tab" data-toggle="tab">Monthly Analysis</a></li>
+            <li role="presentation"><a id="annualAnalysis_tab_link" href="#annualAnalysis" aria-controls="annualAnalysis" role="tab" data-toggle="tab">Annual Analysis</a></li>
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
@@ -59,6 +61,34 @@
                   <div id="observed-chart-P"></div>
                   <div class="flex-container-row"><img id="observed-loading-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
                   <div id="observed-chart-FC"></div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="monthlyAnalysis">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div class="flex-container-row"><img id="mean-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="mean-chart-Q"></div>
+                  <div class="flex-container-row"><img id="std-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="std-chart-Q"></div>
+                  <div class="flex-container-row"><img id="max-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="max-chart-Q"></div>
+                  <div class="flex-container-row"><img id="min-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="min-chart-Q"></div>
+                  <div class="flex-container-row"><img id="mean-loading-S" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="mean-chart-S"></div>
+                  <div class="flex-container-row"><img id="std-loading-S" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="std-chart-S"></div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="annualAnalysis">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div class="flex-container-row"><img id="annual-loading-Q-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="annual-chart-Q-FC"></div>
+                  <div class="flex-container-row"><img id="annual-loading-S-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="annual-chart-S-FC"></div>
                 </div>
               </div>
             </div>
