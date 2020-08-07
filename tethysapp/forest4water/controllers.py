@@ -343,7 +343,7 @@ def get_monthly_mean_discharge_data(request):
             y=df1.iloc[:,0].tolist(),
             name='mean January',
             mode='lines+markers',
-            marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
             line=dict(color="rgb(141,211,199)")
         )
 
@@ -354,7 +354,7 @@ def get_monthly_mean_discharge_data(request):
             y=df2.iloc[:, 0].tolist(),
             name='mean February',
             mode='lines+markers',
-            marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,255,179)")
         )
 
@@ -365,7 +365,7 @@ def get_monthly_mean_discharge_data(request):
             y=df3.iloc[:, 0].tolist(),
             name='mean March',
             mode='lines+markers',
-            marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
             line=dict(color="rgb(190,186,218)")
         )
 
@@ -376,7 +376,7 @@ def get_monthly_mean_discharge_data(request):
             y=df4.iloc[:, 0].tolist(),
             name='mean April',
             mode='lines+markers',
-            marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
             line=dict(color="rgb(251,128,114)")
         )
 
@@ -387,7 +387,7 @@ def get_monthly_mean_discharge_data(request):
             y=df5.iloc[:, 0].tolist(),
             name='mean May',
             mode='lines+markers',
-            marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
             line=dict(color="rgb(128,177,211)")
         )
 
@@ -398,7 +398,7 @@ def get_monthly_mean_discharge_data(request):
             y=df6.iloc[:, 0].tolist(),
             name='mean June',
             mode='lines+markers',
-            marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
             line=dict(color="rgb(253,180,98)")
         )
 
@@ -409,7 +409,7 @@ def get_monthly_mean_discharge_data(request):
             y=df7.iloc[:, 0].tolist(),
             name='mean July',
             mode='lines+markers',
-            marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
             line=dict(color="rgb(179,222,105)")
         )
 
@@ -420,7 +420,7 @@ def get_monthly_mean_discharge_data(request):
             y=df8.iloc[:, 0].tolist(),
             name='mean August',
             mode='lines+markers',
-            marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
             line=dict(color="rgb(252,205,229)")
         )
 
@@ -431,7 +431,7 @@ def get_monthly_mean_discharge_data(request):
             y=df9.iloc[:, 0].tolist(),
             name='mean September',
             mode='lines+markers',
-            marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
             line=dict(color="rgb(217,217,217)")
         )
 
@@ -442,7 +442,7 @@ def get_monthly_mean_discharge_data(request):
             y=df10.iloc[:, 0].tolist(),
             name='mean October',
             mode='lines+markers',
-            marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
             line=dict(color="rgb(188,128,189)")
         )
 
@@ -453,7 +453,7 @@ def get_monthly_mean_discharge_data(request):
             y=df11.iloc[:, 0].tolist(),
             name='mean November',
             mode='lines+markers',
-            marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
             line=dict(color="rgb(204,235,197)")
         )
 
@@ -464,7 +464,7 @@ def get_monthly_mean_discharge_data(request):
             y=df12.iloc[:, 0].tolist(),
             name='mean December',
             mode='lines+markers',
-            marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,237,111)")
         )
 
@@ -1086,7 +1086,7 @@ def get_monthly_max_discharge_data(request):
             y=df2.iloc[:, 0].tolist(),
             name='max February',
             mode='lines+markers',
-            marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,255,179)")
         )
 
@@ -1097,7 +1097,7 @@ def get_monthly_max_discharge_data(request):
             y=df3.iloc[:, 0].tolist(),
             name='max March',
             mode='lines+markers',
-            marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
             line=dict(color="rgb(190,186,218)")
         )
 
@@ -1108,7 +1108,7 @@ def get_monthly_max_discharge_data(request):
             y=df4.iloc[:, 0].tolist(),
             name='max April',
             mode='lines+markers',
-            marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
             line=dict(color="rgb(251,128,114)")
         )
 
@@ -1119,7 +1119,7 @@ def get_monthly_max_discharge_data(request):
             y=df5.iloc[:, 0].tolist(),
             name='max May',
             mode='lines+markers',
-            marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
             line=dict(color="rgb(128,177,211)")
         )
 
@@ -1130,7 +1130,7 @@ def get_monthly_max_discharge_data(request):
             y=df6.iloc[:, 0].tolist(),
             name='max June',
             mode='lines+markers',
-            marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
             line=dict(color="rgb(253,180,98)")
         )
 
@@ -1141,7 +1141,7 @@ def get_monthly_max_discharge_data(request):
             y=df7.iloc[:, 0].tolist(),
             name='max July',
             mode='lines+markers',
-            marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
             line=dict(color="rgb(179,222,105)")
         )
 
@@ -1152,7 +1152,7 @@ def get_monthly_max_discharge_data(request):
             y=df8.iloc[:, 0].tolist(),
             name='max August',
             mode='lines+markers',
-            marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
             line=dict(color="rgb(252,205,229)")
         )
 
@@ -1163,7 +1163,7 @@ def get_monthly_max_discharge_data(request):
             y=df9.iloc[:, 0].tolist(),
             name='max September',
             mode='lines+markers',
-            marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
             line=dict(color="rgb(217,217,217)")
         )
 
@@ -1174,7 +1174,7 @@ def get_monthly_max_discharge_data(request):
             y=df10.iloc[:, 0].tolist(),
             name='max October',
             mode='lines+markers',
-            marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
             line=dict(color="rgb(188,128,189)")
         )
 
@@ -1185,7 +1185,7 @@ def get_monthly_max_discharge_data(request):
             y=df11.iloc[:, 0].tolist(),
             name='max November',
             mode='lines+markers',
-            marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
             line=dict(color="rgb(204,235,197)")
         )
 
@@ -1196,7 +1196,7 @@ def get_monthly_max_discharge_data(request):
             y=df12.iloc[:, 0].tolist(),
             name='max December',
             mode='lines+markers',
-            marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,237,111)")
         )
 
@@ -1468,7 +1468,7 @@ def get_monthly_min_discharge_data(request):
             y=df1.iloc[:,0].tolist(),
             name='min January',
             mode='lines+markers',
-            marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
             line=dict(color="rgb(141,211,199)")
         )
 
@@ -1479,7 +1479,7 @@ def get_monthly_min_discharge_data(request):
             y=df2.iloc[:, 0].tolist(),
             name='min February',
             mode='lines+markers',
-            marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df2.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,255,179)")
         )
 
@@ -1490,7 +1490,7 @@ def get_monthly_min_discharge_data(request):
             y=df3.iloc[:, 0].tolist(),
             name='min March',
             mode='lines+markers',
-            marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df3.iloc[:, 1]).tolist(),
             line=dict(color="rgb(190,186,218)")
         )
 
@@ -1501,7 +1501,7 @@ def get_monthly_min_discharge_data(request):
             y=df4.iloc[:, 0].tolist(),
             name='min April',
             mode='lines+markers',
-            marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df4.iloc[:, 1]).tolist(),
             line=dict(color="rgb(251,128,114)")
         )
 
@@ -1512,7 +1512,7 @@ def get_monthly_min_discharge_data(request):
             y=df5.iloc[:, 0].tolist(),
             name='min May',
             mode='lines+markers',
-            marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df5.iloc[:, 1]).tolist(),
             line=dict(color="rgb(128,177,211)")
         )
 
@@ -1523,7 +1523,7 @@ def get_monthly_min_discharge_data(request):
             y=df6.iloc[:, 0].tolist(),
             name='min June',
             mode='lines+markers',
-            marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df6.iloc[:, 1]).tolist(),
             line=dict(color="rgb(253,180,98)")
         )
 
@@ -1534,7 +1534,7 @@ def get_monthly_min_discharge_data(request):
             y=df7.iloc[:, 0].tolist(),
             name='min July',
             mode='lines+markers',
-            marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df7.iloc[:, 1]).tolist(),
             line=dict(color="rgb(179,222,105)")
         )
 
@@ -1545,7 +1545,7 @@ def get_monthly_min_discharge_data(request):
             y=df8.iloc[:, 0].tolist(),
             name='min August',
             mode='lines+markers',
-            marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df8.iloc[:, 1]).tolist(),
             line=dict(color="rgb(252,205,229)")
         )
 
@@ -1556,7 +1556,7 @@ def get_monthly_min_discharge_data(request):
             y=df9.iloc[:, 0].tolist(),
             name='min September',
             mode='lines+markers',
-            marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df9.iloc[:, 1]).tolist(),
             line=dict(color="rgb(217,217,217)")
         )
 
@@ -1567,7 +1567,7 @@ def get_monthly_min_discharge_data(request):
             y=df10.iloc[:, 0].tolist(),
             name='min October',
             mode='lines+markers',
-            marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df10.iloc[:, 1]).tolist(),
             line=dict(color="rgb(188,128,189)")
         )
 
@@ -1578,7 +1578,7 @@ def get_monthly_min_discharge_data(request):
             y=df11.iloc[:, 0].tolist(),
             name='min November',
             mode='lines+markers',
-            marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df11.iloc[:, 1]).tolist(),
             line=dict(color="rgb(204,235,197)")
         )
 
@@ -1589,7 +1589,7 @@ def get_monthly_min_discharge_data(request):
             y=df12.iloc[:, 0].tolist(),
             name='min December',
             mode='lines+markers',
-            marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df12.iloc[:, 1]).tolist(),
             line=dict(color="rgb(255,237,111)")
         )
 
