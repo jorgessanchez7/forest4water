@@ -105,14 +105,34 @@ class Forest4Water(TethysAppBase):
 	            controller='forest4water.controllers.get_monthly_std_sediments_data'
             ),
             UrlMap(
-	            name='get_scatterPlot_Q_FC',
-	            url='get-scatterPlot-Q-FC',
-	            controller='forest4water.controllers.get_scatterPlot_Q_FC'
+	            name='get_effect_mean_discharge',
+	            url='get-effect-mean-discharge',
+	            controller='forest4water.controllers.get_effect_mean_discharge'
             ),
             UrlMap(
-	            name='get_scatterPlot_S_FC',
-	            url='get-scatterPlot-S-FC',
-	            controller='forest4water.controllers.get_scatterPlot_S_FC'
+	            name='get_effect_std_discharge',
+	            url='get-effect-std-discharge',
+	            controller='forest4water.controllers.get_effect_std_discharge'
+            ),
+            UrlMap(
+	            name='get_effect_max_discharge',
+	            url='get-effect-max-discharge',
+	            controller='forest4water.controllers.get_effect_max_discharge'
+            ),
+            UrlMap(
+	            name='get_effect_min_discharge',
+	            url='get-effect-min-discharge',
+	            controller='forest4water.controllers.get_effect_min_discharge'
+            ),
+            UrlMap(
+	            name='get_effect_mean_sediments',
+	            url='get-effect-mean-sediments',
+	            controller='forest4water.controllers.get_effect_mean_sediments'
+            ),
+            UrlMap(
+	            name='get_effect_std_sediments',
+	            url='get-effect-std-sediments',
+	            controller='forest4water.controllers.get_effect_std_sediments'
             ),
         )
 

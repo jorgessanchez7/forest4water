@@ -1,5 +1,8 @@
-var map;
-var feature_layer;
+let map;
+let stations;
+let feature_layer;
+let stationcode;
+let basin;
 let $loading = $('#view-file-loading');
 
 function init_map() {
@@ -31,7 +34,6 @@ function init_map() {
 			zoom: 5
 		})
 	});
-
 }
 
 let ajax_url = 'https://multi-tethys.byu.edu/geoserver/forest4water/wfs?request=GetCapabilities';
@@ -63,9 +65,64 @@ let capabilities = $.ajax(ajax_url, {
 
 		let extent = ol.proj.transform([minx, miny], 'EPSG:4326', 'EPSG:3857').concat(ol.proj.transform([maxx, maxy], 'EPSG:4326', 'EPSG:3857'));
 
+		console.log(extent)
 		map.getView().fit(extent, map.getSize());
 	}
 });
+
+function add_layer_map(stationcode) {
+
+	map.removeLayer(basin);
+
+	basin = new ol.layer.Image({
+		source: new ol.source.ImageWMS({
+			url: 'https://multi-tethys.byu.edu/geoserver/forest4water/wms',
+			params: { 'LAYERS': stationcode + '_basin' },
+			serverType: 'geoserver',
+			crossOrigin: 'Anonymous'
+		}),
+		opacity: 0.3
+	});
+
+	map.addLayer(basin);
+
+	let ajax_url = 'https://multi-tethys.byu.edu/geoserver/forest4water/wfs?request=GetCapabilities';
+
+	let capabilities = $.ajax(ajax_url, {
+		type: 'GET',
+		data:{
+			service: 'WFS',
+			version: '1.0.0',
+			request: 'GetCapabilities',
+			outputFormat: 'text/javascript'
+		},
+		success: function() {
+			let x = capabilities.responseText
+			.split('<FeatureTypeList>')[1]
+			.split('forest4water:'+ stationcode + '_basin')[1]
+			.split('LatLongBoundingBox ')[1]
+			.split('/></FeatureType>')[0];
+
+			let minx = Number(x.split('"')[1]);
+			let miny = Number(x.split('"')[3]);
+			let maxx = Number(x.split('"')[5]);
+			let maxy = Number(x.split('"')[7]);
+
+			minx = minx + 2;
+			miny = miny + 2;
+			maxx = maxx - 2;
+			maxy = maxy - 2;
+
+			let extent = ol.proj.transform([minx, miny], 'EPSG:4326', 'EPSG:3857').concat(ol.proj.transform([maxx, maxy], 'EPSG:4326', 'EPSG:3857'));
+			console.log(extent)
+
+			map.getView().fit(extent, map.getSize());
+
+		}
+
+	});
+
+}
 
 function map_events() {
 	map.on('pointermove', function(evt) {
@@ -91,41 +148,7 @@ function map_events() {
 			var wms_url = current_layer.getSource().getGetFeatureInfoUrl(evt.coordinate, viewResolution, view.getProjection(), { 'INFO_FORMAT': 'application/json' });
 
 			if (wms_url) {
-				$("#obsgraph").modal('show');
-				$('#observed-chart-Q').addClass('hidden');
-				$('#observed-chart-S').addClass('hidden');
-				$('#observed-chart-T').addClass('hidden');
-				$('#observed-chart-P').addClass('hidden');
-				$('#observed-chart-FC').addClass('hidden');
-				$('#mean-chart-Q').addClass('hidden');
-				$('#mean-trend-chart-Q').addClass('hidden');
-				$('#std-chart-Q').addClass('hidden');
-				$('#std-trend-chart-Q').addClass('hidden');
-				$('#max-chart-Q').addClass('hidden');
-				$('#max-trend-chart-Q').addClass('hidden');
-				$('#min-chart-Q').addClass('hidden');
-				$('#min-trend-chart-Q').addClass('hidden');
-				$('#mean-chart-S').addClass('hidden');
-				$('#std-chart-S').addClass('hidden');
-				$('#annual-chart-Q-FC').addClass('hidden');
-				$('#annual-chart-S-FC').addClass('hidden');
-				$('#observed-loading-Q').removeClass('hidden');
-				$('#observed-loading-S').removeClass('hidden');
-				$('#observed-loading-T').removeClass('hidden');
-				$('#observed-loading-P').removeClass('hidden');
-				$('#observed-loading-FC').removeClass('hidden');
-				$('#mean-loading-Q').removeClass('hidden');
-				$('#mean-trend-loading-Q').removeClass('hidden');
-				$('#std-loading-Q').removeClass('hidden');
-				$('#std-trend-loading-Q').removeClass('hidden');
-				$('#max-loading-Q').removeClass('hidden');
-				$('#max-trend-loading-Q').removeClass('hidden');
-				$('#min-loading-Q').removeClass('hidden');
-				$('#min-trend-loading-Q').removeClass('hidden');
-				$('#mean-loading-S').removeClass('hidden');
-				$('#std-loading-S').removeClass('hidden');
-				$('#annual-loading-Q-FC').removeClass('hidden');
-				$('#annual-loading-S-FC').removeClass('hidden');
+
 				$("#station-info").empty()
 
 				$.ajax({
@@ -155,10 +178,65 @@ function map_events() {
                         get_monthly_min_trend_discharge_data (stationcode, stationname);
                         get_monthly_mean_sediments_data (stationcode, stationname);
                         get_monthly_std_sediments_data (stationcode, stationname);
-                        get_scatterPlot_Q_FC (stationcode, stationname);
-                        get_scatterPlot_S_FC (stationcode, stationname);
+                        get_effect_mean_discharge (stationcode, stationname);
+                        get_effect_std_discharge (stationcode, stationname);
+                        get_effect_max_discharge (stationcode, stationname);
+                        get_effect_min_discharge (stationcode, stationname);
+                        get_effect_mean_sediments (stationcode, stationname);
+                        get_effect_std_sediments (stationcode, stationname);
+                        add_layer_map (stationcode);
                     }
                 });
+
+                var delayInMilliseconds = 5000; //5 seconds
+
+                setTimeout(function() {
+                	//your code to be executed after 5 seconds
+                	$("#obsgraph").modal('show');
+					$('#observed-chart-Q').addClass('hidden');
+					$('#observed-chart-S').addClass('hidden');
+					$('#observed-chart-T').addClass('hidden');
+					$('#observed-chart-P').addClass('hidden');
+					$('#observed-chart-FC').addClass('hidden');
+					$('#mean-chart-Q').addClass('hidden');
+					$('#mean-trend-chart-Q').addClass('hidden');
+					$('#std-chart-Q').addClass('hidden');
+					$('#std-trend-chart-Q').addClass('hidden');
+					$('#max-chart-Q').addClass('hidden');
+					$('#max-trend-chart-Q').addClass('hidden');
+					$('#min-chart-Q').addClass('hidden');
+					$('#min-trend-chart-Q').addClass('hidden');
+					$('#mean-chart-S').addClass('hidden');
+					$('#std-chart-S').addClass('hidden');
+					$('#effect-mean-chart-Q').addClass('hidden');
+					$('#effect-std-chart-Q').addClass('hidden');
+					$('#effect-max-chart-Q').addClass('hidden');
+					$('#effect-min-chart-Q').addClass('hidden');
+					$('#effect-mean-chart-S').addClass('hidden');
+					$('#effect-std-chart-S').addClass('hidden');
+					$('#observed-loading-Q').removeClass('hidden');
+					$('#observed-loading-S').removeClass('hidden');
+					$('#observed-loading-T').removeClass('hidden');
+					$('#observed-loading-P').removeClass('hidden');
+					$('#observed-loading-FC').removeClass('hidden');
+					$('#mean-loading-Q').removeClass('hidden');
+					$('#mean-trend-loading-Q').removeClass('hidden');
+					$('#std-loading-Q').removeClass('hidden');
+					$('#std-trend-loading-Q').removeClass('hidden');
+					$('#max-loading-Q').removeClass('hidden');
+					$('#max-trend-loading-Q').removeClass('hidden');
+					$('#min-loading-Q').removeClass('hidden');
+					$('#min-trend-loading-Q').removeClass('hidden');
+					$('#mean-loading-S').removeClass('hidden');
+					$('#std-loading-S').removeClass('hidden');
+					$('#effect-mean-loading-Q').removeClass('hidden');
+					$('#effect-std-loading-Q').removeClass('hidden');
+					$('#effect-max-loading-Q').removeClass('hidden');
+					$('#effect-min-loading-Q').removeClass('hidden');
+					$('#effect-mean-loading-S').removeClass('hidden');
+					$('#effect-std-loading-S').removeClass('hidden');
+				}, delayInMilliseconds);
+
 			}
 		}
 
@@ -825,14 +903,14 @@ function get_monthly_std_sediments_data (stationcode, stationname) {
     });
 };
 
-function get_scatterPlot_Q_FC (stationcode, stationname) {
-	$('#annual-loading-Q-FC').removeClass('hidden');
+function get_effect_mean_discharge (stationcode, stationname) {
+	$('#effect-mean-loading-Q').removeClass('hidden');
     $.ajax({
-        url: 'get-scatterPlot-Q-FC',
+        url: 'get-effect-mean-discharge',
         type: 'GET',
         data: {'stationcode' : stationcode, 'stationname': stationname},
         error: function () {
-            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge and/or forecast cover data</strong></p>');
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge and/or forest data</strong></p>');
             $('#info').removeClass('hidden');
 
             setTimeout(function () {
@@ -841,21 +919,21 @@ function get_scatterPlot_Q_FC (stationcode, stationname) {
         },
         success: function (data) {
             if (!data.error) {
-                $('#annual-loading-Q-FC').addClass('hidden');
+                $('#effect-mean-loading-Q').addClass('hidden');
                 $('#dates').removeClass('hidden');
                 $loading.addClass('hidden');
-                $('#annual-chart-Q-FC').removeClass('hidden');
-                $('#annual-chart-Q-FC').html(data);
+                $('#effect-mean-chart-Q').removeClass('hidden');
+                $('#effect-mean-chart-Q').html(data);
 
                 //resize main graph
-                Plotly.Plots.resize($("#annual-chart-Q-FC .js-plotly-plot")[0]);
-                Plotly.relayout($("#annual-chart-Q-FC .js-plotly-plot")[0], {
+                Plotly.Plots.resize($("#effect-mean-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-mean-chart-Q .js-plotly-plot")[0], {
                 	'xaxis.autorange': true,
                 	'yaxis.autorange': true
                 });
 
             } else if (data.error) {
-            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge and/or Forecast Cover Data</strong></p>');
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge and/or Forest Data</strong></p>');
             	$('#info').removeClass('hidden');
 
             	setTimeout(function() {
@@ -869,14 +947,14 @@ function get_scatterPlot_Q_FC (stationcode, stationname) {
     });
 };
 
-function get_scatterPlot_S_FC (stationcode, stationname) {
-	$('#annual-loading-S-FC').removeClass('hidden');
+function get_effect_std_discharge (stationcode, stationname) {
+	$('#effect-std-loading-Q').removeClass('hidden');
     $.ajax({
-        url: 'get-scatterPlot-S-FC',
+        url: 'get-effect-std-discharge',
         type: 'GET',
         data: {'stationcode' : stationcode, 'stationname': stationname},
         error: function () {
-            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the sediments and/or forecast cover data</strong></p>');
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge and/or forest data</strong></p>');
             $('#info').removeClass('hidden');
 
             setTimeout(function () {
@@ -885,21 +963,197 @@ function get_scatterPlot_S_FC (stationcode, stationname) {
         },
         success: function (data) {
             if (!data.error) {
-                $('#annual-loading-S-FC').addClass('hidden');
+                $('#effect-std-loading-Q').addClass('hidden');
                 $('#dates').removeClass('hidden');
                 $loading.addClass('hidden');
-                $('#annual-chart-S-FC').removeClass('hidden');
-                $('#annual-chart-S-FC').html(data);
+                $('#effect-std-chart-Q').removeClass('hidden');
+                $('#effect-std-chart-Q').html(data);
 
                 //resize main graph
-                Plotly.Plots.resize($("#annual-chart-S-FC .js-plotly-plot")[0]);
-                Plotly.relayout($("#annual-chart-S-FC .js-plotly-plot")[0], {
+                Plotly.Plots.resize($("#effect-std-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-std-chart-Q .js-plotly-plot")[0], {
                 	'xaxis.autorange': true,
                 	'yaxis.autorange': true
                 });
 
             } else if (data.error) {
-            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Sediments and/or Forecast Cover Data</strong></p>');
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge and/or Forest Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_effect_max_discharge (stationcode, stationname) {
+	$('#effect-max-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-effect-max-discharge',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge and/or forest data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#effect-max-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#effect-max-chart-Q').removeClass('hidden');
+                $('#effect-max-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#effect-max-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-max-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge and/or Forest Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_effect_min_discharge (stationcode, stationname) {
+	$('#effect-min-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-effect-min-discharge',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge and/or forest data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#effect-min-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#effect-min-chart-Q').removeClass('hidden');
+                $('#effect-min-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#effect-min-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-min-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge and/or Forest Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_effect_mean_sediments (stationcode, stationname) {
+	$('#effect-mean-loading-S').removeClass('hidden');
+    $.ajax({
+        url: 'get-effect-mean-sediments',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the sediments and/or forest data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#effect-mean-loading-S').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#effect-mean-chart-S').removeClass('hidden');
+                $('#effect-mean-chart-S').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#effect-mean-chart-S .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-mean-chart-S .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Sediments and/or Forest Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_effect_std_sediments (stationcode, stationname) {
+	$('#effect-std-loading-S').removeClass('hidden');
+    $.ajax({
+        url: 'get-effect-std-sediments',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the sediments and/or forest data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#effect-std-loading-S').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#effect-std-chart-S').removeClass('hidden');
+                $('#effect-std-chart-S').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#effect-std-chart-S .js-plotly-plot")[0]);
+                Plotly.relayout($("#effect-std-chart-S .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Sediments and/or Forest Data</strong></p>');
             	$('#info').removeClass('hidden');
 
             	setTimeout(function() {
@@ -995,18 +1249,37 @@ function resize_graphs() {
         });
     });
 
-    $("#annualAnalysis_tab_link").click(function() {
-        Plotly.Plots.resize($("#annual-chart-Q-FC .js-plotly-plot")[0]);
-        Plotly.relayout($("#annual-chart-Q-FC .js-plotly-plot")[0], {
-        	'xaxis.autorange': true,
-        	'yaxis.autorange': true
+    $("#effects_tab_link").click(function() {
+    	Plotly.Plots.resize($("#effect-mean-chart-Q .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-mean-chart-Q .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
         });
-        Plotly.Plots.resize($("#annual-chart-S-FC .js-plotly-plot")[0]);
-        Plotly.relayout($("#annual-chart-S-FC .js-plotly-plot")[0], {
-        	'xaxis.autorange': true,
-        	'yaxis.autorange': true
+        Plotly.Plots.resize($("#effect-std-chart-Q .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-std-chart-Q .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
         });
-
+        Plotly.Plots.resize($("#effect-max-chart-Q .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-max-chart-Q .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
+        });
+        Plotly.Plots.resize($("#effect-min-chart-Q .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-min-chart-Q .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
+        });
+        Plotly.Plots.resize($("#effect-mean-chart-S .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-mean-chart-S .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
+        });
+        Plotly.Plots.resize($("#effect-std-chart-S .js-plotly-plot")[0]);
+    	Plotly.relayout($("#effect-std-chart-S .js-plotly-plot")[0], {
+    		'xaxis.autorange': true,
+    		'yaxis.autorange': true
+        });
     });
 };
 

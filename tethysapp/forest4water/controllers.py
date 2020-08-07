@@ -6,7 +6,10 @@ import io
 import requests
 import pandas as pd
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 import statsmodels.api as sm
+import scipy.stats as sp
+import calendar
 from tethys_sdk.gizmos import PlotlyView
 from django.http import HttpResponse, JsonResponse
 
@@ -1814,7 +1817,7 @@ def get_monthly_mean_sediments_data(request):
         mean_sediments = df['Sm'].tolist()
 
         pairs = [list(a) for a in zip(dates, mean_sediments)]
-        mean_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        mean_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Sediment Concentration (kg/m3)'])
         mean_sediments_df.set_index('Datetime', inplace=True)
 
         mean_jan_df = mean_sediments_df[mean_sediments_df.index.month == 1]
@@ -1969,7 +1972,7 @@ def get_monthly_std_sediments_data(request):
         std_sediments = df['Ss'].tolist()
 
         pairs = [list(a) for a in zip(dates, std_sediments)]
-        std_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        std_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Sediment Concentration (kg/m3)'])
         std_sediments_df.set_index('Datetime', inplace=True)
 
         std_jan_df = std_sediments_df[std_sediments_df.index.month == 1]
@@ -2099,7 +2102,7 @@ def get_monthly_std_sediments_data(request):
         print(str(e))
         return JsonResponse({'error': 'No observed data found for the selected station.'})
 
-def get_scatterPlot_Q_FC(request):
+def get_effect_mean_discharge(request):
     """
     Get observed data from csv files in Hydroshare
     """
@@ -2122,84 +2125,124 @@ def get_scatterPlot_Q_FC(request):
 
         dates = df.index.tolist()
         mean_discharge = df['Qm'].tolist()
-        max_discharge = df['Qx'].tolist()
-        min_discharge = df['Qn'].tolist()
-        forest_cover = df['Fm'].tolist()
         total_precipitation = df['Pm'].tolist()
+        forest_cover = df['Fm'].tolist()
 
         pairs = [list(a) for a in zip(dates, mean_discharge)]
         mean_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
         mean_discharge_df.set_index('Datetime', inplace=True)
 
-        pairs = [list(a) for a in zip(dates, max_discharge)]
-        max_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
-        max_discharge_df.set_index('Datetime', inplace=True)
-
-        pairs = [list(a) for a in zip(dates, min_discharge)]
-        min_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
-        min_discharge_df.set_index('Datetime', inplace=True)
-
-        pairs = [list(a) for a in zip(dates, forest_cover)]
-        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
-        forest_cover_df.set_index('Datetime', inplace=True)
-
         pairs = [list(a) for a in zip(dates, total_precipitation)]
         total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
         total_precipitation_df.set_index('Datetime', inplace=True)
 
-        mean_annual_discharge_df = mean_discharge_df.groupby(mean_discharge_df.index.strftime("%Y")).mean()
-        mean_annual_discharge_df.index = pd.to_datetime(mean_annual_discharge_df.index)
+        pairs = [list(a) for a in zip(dates, forest_cover)]
+        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
+        forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
 
-        max_annual_discharge_df = max_discharge_df.groupby(max_discharge_df.index.strftime("%Y")).max()
-        max_annual_discharge_df.index = pd.to_datetime(max_annual_discharge_df.index)
+        mean_jan_df = mean_discharge_df[mean_discharge_df.index.month == 1]
+        mean_feb_df = mean_discharge_df[mean_discharge_df.index.month == 2]
+        mean_mar_df = mean_discharge_df[mean_discharge_df.index.month == 3]
+        mean_apr_df = mean_discharge_df[mean_discharge_df.index.month == 4]
+        mean_may_df = mean_discharge_df[mean_discharge_df.index.month == 5]
+        mean_jun_df = mean_discharge_df[mean_discharge_df.index.month == 6]
+        mean_jul_df = mean_discharge_df[mean_discharge_df.index.month == 7]
+        mean_aug_df = mean_discharge_df[mean_discharge_df.index.month == 8]
+        mean_sep_df = mean_discharge_df[mean_discharge_df.index.month == 9]
+        mean_oct_df = mean_discharge_df[mean_discharge_df.index.month == 10]
+        mean_nov_df = mean_discharge_df[mean_discharge_df.index.month == 11]
+        mean_dec_df = mean_discharge_df[mean_discharge_df.index.month == 12]
 
-        min_annual_discharge_df = min_discharge_df.groupby(min_discharge_df.index.strftime("%Y")).min()
-        min_annual_discharge_df.index = pd.to_datetime(min_annual_discharge_df.index)
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
 
-        annual_forest_cover_df = forest_cover_df.groupby(forest_cover_df.index.strftime("%Y")).mean()
-        annual_forest_cover_df.index = pd.to_datetime(annual_forest_cover_df.index)
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, mean_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, mean_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, mean_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, mean_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, mean_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, mean_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, mean_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, mean_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, mean_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, mean_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, mean_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, mean_dec_df.iloc[:, 0].values)
 
-        total_annual_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%Y")).sum()
-        total_annual_precipitation_df.index = pd.to_datetime(total_annual_precipitation_df.index)
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [mean_discharge_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
 
-        df1 = pd.concat([mean_annual_discharge_df, annual_forest_cover_df, total_annual_precipitation_df], axis=1)
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
 
-        mean_Q = go.Scatter(
-            x=df1.iloc[:,1].tolist(),
-            y=df1.iloc[:,0].tolist(),
-            mode='lines+markers',
-            name='Mean Discharge',
-            marker_size=(0.003*df1.iloc[:,2]).tolist(),
-            line=dict(color='#00cc96')
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in mean discharge for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
         )
 
-        df2 = pd.concat([max_annual_discharge_df, annual_forest_cover_df, total_annual_precipitation_df], axis=1)
-
-        max_Q = go.Scatter(
-            x=df2.iloc[:,1].tolist(),
-            y=df2.iloc[:,0].tolist(),
-            mode='lines+markers',
-            name='Max Discharge',
-            marker_size=(0.003*df2.iloc[:,2]).tolist(),
-            line=dict(color='#ef553b')
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
         )
 
-        df3 = pd.concat([min_annual_discharge_df, annual_forest_cover_df, total_annual_precipitation_df], axis=1)
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
 
-        min_Q = go.Scatter(
-            x=df3.iloc[:,1].tolist(),
-            y=df3.iloc[:,0].tolist(),
-            mode='lines+markers',
-            name='Min Discharge',
-            marker_size=(0.003*df3.iloc[:, 2]).tolist(),
-            line=dict(color='#636efa')
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
         )
 
-        layout = go.Layout(title='Mean Streamflow at {0}-{1}'.format(nomEstacion, codEstacion),
-                           xaxis=dict(title='Forest Cover (%)', ), yaxis=dict(title='Discharge (m<sup>3</sup>/s)',
-                                                                   autorange=True), showlegend=True)
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
 
-        chart_obj = PlotlyView(go.Figure(data=[mean_Q, max_Q, min_Q], layout=layout))
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
 
         context = {
             'gizmo_object': chart_obj,
@@ -2211,7 +2254,463 @@ def get_scatterPlot_Q_FC(request):
         print(str(e))
         return JsonResponse({'error': 'No observed data found for the selected station.'})
 
-def get_scatterPlot_S_FC(request):
+def get_effect_std_discharge(request):
+    """
+    Get observed data from csv files in Hydroshare
+    """
+
+    get_data = request.GET
+
+    try:
+
+        codEstacion = get_data['stationcode']
+        nomEstacion = get_data['stationname']
+
+        '''Get Observed Data'''
+
+        url = 'https://www.hydroshare.org/resource/6278b7dfa9494764b6208c4a47845b4c/data/contents/{0}.csv'.format(codEstacion)
+
+        s = requests.get(url, verify=False).content
+
+        df = pd.read_csv(io.StringIO(s.decode('utf-8')), index_col=0)
+        df.index = pd.to_datetime(df.index)
+
+        dates = df.index.tolist()
+        std_discharge = df['Qs'].tolist()
+        total_precipitation = df['Pm'].tolist()
+        forest_cover = df['Fm'].tolist()
+
+        pairs = [list(a) for a in zip(dates, std_discharge)]
+        std_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        std_discharge_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, total_precipitation)]
+        total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
+        total_precipitation_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, forest_cover)]
+        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
+        forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
+
+        std_jan_df = std_discharge_df[std_discharge_df.index.month == 1]
+        std_feb_df = std_discharge_df[std_discharge_df.index.month == 2]
+        std_mar_df = std_discharge_df[std_discharge_df.index.month == 3]
+        std_apr_df = std_discharge_df[std_discharge_df.index.month == 4]
+        std_may_df = std_discharge_df[std_discharge_df.index.month == 5]
+        std_jun_df = std_discharge_df[std_discharge_df.index.month == 6]
+        std_jul_df = std_discharge_df[std_discharge_df.index.month == 7]
+        std_aug_df = std_discharge_df[std_discharge_df.index.month == 8]
+        std_sep_df = std_discharge_df[std_discharge_df.index.month == 9]
+        std_oct_df = std_discharge_df[std_discharge_df.index.month == 10]
+        std_nov_df = std_discharge_df[std_discharge_df.index.month == 11]
+        std_dec_df = std_discharge_df[std_discharge_df.index.month == 12]
+
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
+
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, std_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, std_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, std_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, std_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, std_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, std_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, std_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, std_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, std_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, std_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, std_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, std_dec_df.iloc[:, 0].values)
+
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [std_discharge_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
+
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
+
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in std discharge for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
+
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
+
+        context = {
+            'gizmo_object': chart_obj,
+        }
+
+        return render(request, 'forest4water/gizmo_ajax.html', context)
+
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({'error': 'No observed data found for the selected station.'})
+
+def get_effect_max_discharge(request):
+    """
+    Get observed data from csv files in Hydroshare
+    """
+
+    get_data = request.GET
+
+    try:
+
+        codEstacion = get_data['stationcode']
+        nomEstacion = get_data['stationname']
+
+        '''Get Observed Data'''
+
+        url = 'https://www.hydroshare.org/resource/6278b7dfa9494764b6208c4a47845b4c/data/contents/{0}.csv'.format(codEstacion)
+
+        s = requests.get(url, verify=False).content
+
+        df = pd.read_csv(io.StringIO(s.decode('utf-8')), index_col=0)
+        df.index = pd.to_datetime(df.index)
+
+        dates = df.index.tolist()
+        max_discharge = df['Qx'].tolist()
+        total_precipitation = df['Pm'].tolist()
+        forest_cover = df['Fm'].tolist()
+
+        pairs = [list(a) for a in zip(dates, max_discharge)]
+        max_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        max_discharge_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, total_precipitation)]
+        total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
+        total_precipitation_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, forest_cover)]
+        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
+        forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
+
+        max_jan_df = max_discharge_df[max_discharge_df.index.month == 1]
+        max_feb_df = max_discharge_df[max_discharge_df.index.month == 2]
+        max_mar_df = max_discharge_df[max_discharge_df.index.month == 3]
+        max_apr_df = max_discharge_df[max_discharge_df.index.month == 4]
+        max_may_df = max_discharge_df[max_discharge_df.index.month == 5]
+        max_jun_df = max_discharge_df[max_discharge_df.index.month == 6]
+        max_jul_df = max_discharge_df[max_discharge_df.index.month == 7]
+        max_aug_df = max_discharge_df[max_discharge_df.index.month == 8]
+        max_sep_df = max_discharge_df[max_discharge_df.index.month == 9]
+        max_oct_df = max_discharge_df[max_discharge_df.index.month == 10]
+        max_nov_df = max_discharge_df[max_discharge_df.index.month == 11]
+        max_dec_df = max_discharge_df[max_discharge_df.index.month == 12]
+
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
+
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, max_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, max_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, max_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, max_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, max_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, max_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, max_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, max_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, max_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, max_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, max_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, max_dec_df.iloc[:, 0].values)
+
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [max_discharge_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
+
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
+
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in max discharge for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
+
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
+
+        context = {
+            'gizmo_object': chart_obj,
+        }
+
+        return render(request, 'forest4water/gizmo_ajax.html', context)
+
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({'error': 'No observed data found for the selected station.'})
+
+def get_effect_min_discharge(request):
+    """
+    Get observed data from csv files in Hydroshare
+    """
+
+    get_data = request.GET
+
+    try:
+
+        codEstacion = get_data['stationcode']
+        nomEstacion = get_data['stationname']
+
+        '''Get Observed Data'''
+
+        url = 'https://www.hydroshare.org/resource/6278b7dfa9494764b6208c4a47845b4c/data/contents/{0}.csv'.format(codEstacion)
+
+        s = requests.get(url, verify=False).content
+
+        df = pd.read_csv(io.StringIO(s.decode('utf-8')), index_col=0)
+        df.index = pd.to_datetime(df.index)
+
+        dates = df.index.tolist()
+        min_discharge = df['Qn'].tolist()
+        total_precipitation = df['Pm'].tolist()
+        forest_cover = df['Fm'].tolist()
+
+        pairs = [list(a) for a in zip(dates, min_discharge)]
+        min_discharge_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        min_discharge_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, total_precipitation)]
+        total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
+        total_precipitation_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, forest_cover)]
+        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
+        forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
+
+        min_jan_df = min_discharge_df[min_discharge_df.index.month == 1]
+        min_feb_df = min_discharge_df[min_discharge_df.index.month == 2]
+        min_mar_df = min_discharge_df[min_discharge_df.index.month == 3]
+        min_apr_df = min_discharge_df[min_discharge_df.index.month == 4]
+        min_may_df = min_discharge_df[min_discharge_df.index.month == 5]
+        min_jun_df = min_discharge_df[min_discharge_df.index.month == 6]
+        min_jul_df = min_discharge_df[min_discharge_df.index.month == 7]
+        min_aug_df = min_discharge_df[min_discharge_df.index.month == 8]
+        min_sep_df = min_discharge_df[min_discharge_df.index.month == 9]
+        min_oct_df = min_discharge_df[min_discharge_df.index.month == 10]
+        min_nov_df = min_discharge_df[min_discharge_df.index.month == 11]
+        min_dec_df = min_discharge_df[min_discharge_df.index.month == 12]
+
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
+
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, min_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, min_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, min_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, min_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, min_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, min_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, min_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, min_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, min_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, min_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, min_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, min_dec_df.iloc[:, 0].values)
+
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [min_discharge_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
+
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
+
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in min discharge for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
+
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
+
+        context = {
+            'gizmo_object': chart_obj,
+        }
+
+        return render(request, 'forest4water/gizmo_ajax.html', context)
+
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({'error': 'No observed data found for the selected station.'})
+
+def get_effect_mean_sediments(request):
     """
     Get observed data from csv files in Hydroshare
     """
@@ -2234,37 +2733,276 @@ def get_scatterPlot_S_FC(request):
 
         dates = df.index.tolist()
         mean_sediments = df['Sm'].tolist()
+        total_precipitation = df['Pm'].tolist()
         forest_cover = df['Fm'].tolist()
 
         pairs = [list(a) for a in zip(dates, mean_sediments)]
-        mean_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        mean_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Sediment Concentration (kg/m3)'])
         mean_sediments_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, total_precipitation)]
+        total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
+        total_precipitation_df.set_index('Datetime', inplace=True)
 
         pairs = [list(a) for a in zip(dates, forest_cover)]
         forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
         forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
 
-        mean_annual_sediments_df = mean_sediments_df.groupby(mean_sediments_df.index.strftime("%Y")).mean()
-        mean_annual_sediments_df.index = pd.to_datetime(mean_annual_sediments_df.index)
+        mean_jan_df = mean_sediments_df[mean_sediments_df.index.month == 1]
+        mean_feb_df = mean_sediments_df[mean_sediments_df.index.month == 2]
+        mean_mar_df = mean_sediments_df[mean_sediments_df.index.month == 3]
+        mean_apr_df = mean_sediments_df[mean_sediments_df.index.month == 4]
+        mean_may_df = mean_sediments_df[mean_sediments_df.index.month == 5]
+        mean_jun_df = mean_sediments_df[mean_sediments_df.index.month == 6]
+        mean_jul_df = mean_sediments_df[mean_sediments_df.index.month == 7]
+        mean_aug_df = mean_sediments_df[mean_sediments_df.index.month == 8]
+        mean_sep_df = mean_sediments_df[mean_sediments_df.index.month == 9]
+        mean_oct_df = mean_sediments_df[mean_sediments_df.index.month == 10]
+        mean_nov_df = mean_sediments_df[mean_sediments_df.index.month == 11]
+        mean_dec_df = mean_sediments_df[mean_sediments_df.index.month == 12]
 
-        annual_forest_cover_df = forest_cover_df.groupby(forest_cover_df.index.strftime("%Y")).mean()
-        annual_forest_cover_df.index = pd.to_datetime(annual_forest_cover_df.index)
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
 
-        df1 = pd.concat([mean_annual_sediments_df, annual_forest_cover_df], axis=1)
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, mean_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, mean_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, mean_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, mean_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, mean_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, mean_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, mean_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, mean_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, mean_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, mean_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, mean_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, mean_dec_df.iloc[:, 0].values)
 
-        mean_S = go.Scatter(
-            x=df1.iloc[:,1].tolist(),
-            y=df1.iloc[:,0].tolist(),
-            mode='lines+markers',
-            name='Sediment Concentration',
-            line=dict(color='#00cc96')
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [mean_sediments_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
+
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
+
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in mean sediment concentration for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
         )
 
-        layout = go.Layout(title='Mean Sediment Concentration at {0}-{1}'.format(nomEstacion, codEstacion),
-                           xaxis=dict(title='Forest Cover (%)', ), yaxis=dict(title='Sediment Concentration (kg/m<sup>3</sup>)',
-                                                                   autorange=True), showlegend=True)
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
+        )
 
-        chart_obj = PlotlyView(go.Figure(data=[mean_S], layout=layout))
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
+
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
+
+        context = {
+            'gizmo_object': chart_obj,
+        }
+
+        return render(request, 'forest4water/gizmo_ajax.html', context)
+
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({'error': 'No observed data found for the selected station.'})
+
+def get_effect_std_sediments(request):
+    """
+    Get observed data from csv files in Hydroshare
+    """
+
+    get_data = request.GET
+
+    try:
+
+        codEstacion = get_data['stationcode']
+        nomEstacion = get_data['stationname']
+
+        '''Get Observed Data'''
+
+        url = 'https://www.hydroshare.org/resource/6278b7dfa9494764b6208c4a47845b4c/data/contents/{0}.csv'.format(codEstacion)
+
+        s = requests.get(url, verify=False).content
+
+        df = pd.read_csv(io.StringIO(s.decode('utf-8')), index_col=0)
+        df.index = pd.to_datetime(df.index)
+
+        dates = df.index.tolist()
+        std_sediments = df['Ss'].tolist()
+        total_precipitation = df['Pm'].tolist()
+        forest_cover = df['Fm'].tolist()
+
+        pairs = [list(a) for a in zip(dates, std_sediments)]
+        std_sediments_df = pd.DataFrame(pairs, columns=['Datetime', 'Streamflow (m3/s)'])
+        std_sediments_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, total_precipitation)]
+        total_precipitation_df = pd.DataFrame(pairs, columns=['Datetime', 'Precipitation (mm)'])
+        total_precipitation_df.set_index('Datetime', inplace=True)
+
+        pairs = [list(a) for a in zip(dates, forest_cover)]
+        forest_cover_df = pd.DataFrame(pairs, columns=['Datetime', 'Forest Cover (%)'])
+        forest_cover_df.set_index('Datetime', inplace=True)
+        forest_cover_df['Forest Cover (%)'] = 100 - forest_cover_df['Forest Cover (%)']
+
+        std_jan_df = std_sediments_df[std_sediments_df.index.month == 1]
+        std_feb_df = std_sediments_df[std_sediments_df.index.month == 2]
+        std_mar_df = std_sediments_df[std_sediments_df.index.month == 3]
+        std_apr_df = std_sediments_df[std_sediments_df.index.month == 4]
+        std_may_df = std_sediments_df[std_sediments_df.index.month == 5]
+        std_jun_df = std_sediments_df[std_sediments_df.index.month == 6]
+        std_jul_df = std_sediments_df[std_sediments_df.index.month == 7]
+        std_aug_df = std_sediments_df[std_sediments_df.index.month == 8]
+        std_sep_df = std_sediments_df[std_sediments_df.index.month == 9]
+        std_oct_df = std_sediments_df[std_sediments_df.index.month == 10]
+        std_nov_df = std_sediments_df[std_sediments_df.index.month == 11]
+        std_dec_df = std_sediments_df[std_sediments_df.index.month == 12]
+
+        forest_jan_df = forest_cover_df[forest_cover_df.index.month == 1]
+        forest_feb_df = forest_cover_df[forest_cover_df.index.month == 2]
+        forest_mar_df = forest_cover_df[forest_cover_df.index.month == 3]
+        forest_apr_df = forest_cover_df[forest_cover_df.index.month == 4]
+        forest_may_df = forest_cover_df[forest_cover_df.index.month == 5]
+        forest_jun_df = forest_cover_df[forest_cover_df.index.month == 6]
+        forest_jul_df = forest_cover_df[forest_cover_df.index.month == 7]
+        forest_aug_df = forest_cover_df[forest_cover_df.index.month == 8]
+        forest_sep_df = forest_cover_df[forest_cover_df.index.month == 9]
+        forest_oct_df = forest_cover_df[forest_cover_df.index.month == 10]
+        forest_nov_df = forest_cover_df[forest_cover_df.index.month == 11]
+        forest_dec_df = forest_cover_df[forest_cover_df.index.month == 12]
+
+        slope_jan, intercept_jan, r_value_jan, p_value_jan, std_err_jan = sp.linregress(forest_jan_df.iloc[:, 0].values, std_jan_df.iloc[:, 0].values)
+        slope_feb, intercept_feb, r_value_feb, p_value_feb, std_err_feb = sp.linregress(forest_feb_df.iloc[:, 0].values, std_feb_df.iloc[:, 0].values)
+        slope_mar, intercept_mar, r_value_mar, p_value_mar, std_err_mar = sp.linregress(forest_mar_df.iloc[:, 0].values, std_mar_df.iloc[:, 0].values)
+        slope_apr, intercept_apr, r_value_apr, p_value_apr, std_err_apr = sp.linregress(forest_apr_df.iloc[:, 0].values, std_apr_df.iloc[:, 0].values)
+        slope_may, intercept_may, r_value_may, p_value_may, std_err_may = sp.linregress(forest_may_df.iloc[:, 0].values, std_may_df.iloc[:, 0].values)
+        slope_jun, intercept_jun, r_value_jun, p_value_jun, std_err_jun = sp.linregress(forest_jun_df.iloc[:, 0].values, std_jun_df.iloc[:, 0].values)
+        slope_jul, intercept_jul, r_value_jul, p_value_jul, std_err_jul = sp.linregress(forest_jul_df.iloc[:, 0].values, std_jul_df.iloc[:, 0].values)
+        slope_aug, intercept_aug, r_value_aug, p_value_aug, std_err_aug = sp.linregress(forest_aug_df.iloc[:, 0].values, std_aug_df.iloc[:, 0].values)
+        slope_sep, intercept_sep, r_value_sep, p_value_sep, std_err_sep = sp.linregress(forest_sep_df.iloc[:, 0].values, std_sep_df.iloc[:, 0].values)
+        slope_oct, intercept_oct, r_value_oct, p_value_oct, std_err_oct = sp.linregress(forest_oct_df.iloc[:, 0].values, std_oct_df.iloc[:, 0].values)
+        slope_nov, intercept_nov, r_value_nov, p_value_nov, std_err_nov = sp.linregress(forest_nov_df.iloc[:, 0].values, std_nov_df.iloc[:, 0].values)
+        slope_dec, intercept_dec, r_value_dec, p_value_dec, std_err_dec = sp.linregress(forest_dec_df.iloc[:, 0].values, std_dec_df.iloc[:, 0].values)
+
+        slopes = [slope_jan, slope_feb, slope_mar, slope_apr, slope_may, slope_jun, slope_jul, slope_aug, slope_sep, slope_oct, slope_nov, slope_dec]
+        months = [std_sediments_df.index.month.unique().tolist()]
+        months = months[0]
+        months.sort()
+
+        pairs = [list(a) for a in zip(months, slopes)]
+        slopes_df = pd.DataFrame(pairs, columns=['Month', 'Slope'])
+        slopes_df['Month'] = slopes_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        slopes_df.set_index('Month', inplace=True)
+
+        mean_monthly_precipitation_df = total_precipitation_df.groupby(total_precipitation_df.index.strftime("%m")).mean()
+        pairs = [list(a) for a in zip(mean_monthly_precipitation_df.index, mean_monthly_precipitation_df.iloc[:,0])]
+        mean_monthly_precipitation_df = pd.DataFrame(pairs, columns=['Month', 'Precipitation (mm)'])
+        for i in range(0, len(mean_monthly_precipitation_df['Month'])):
+            mean_monthly_precipitation_df['Month'][i] = int(mean_monthly_precipitation_df['Month'][i])
+        mean_monthly_precipitation_df['Month'] = mean_monthly_precipitation_df['Month'].apply(lambda x: calendar.month_abbr[x])
+        mean_monthly_precipitation_df.set_index('Month', inplace=True)
+
+        fig = make_subplots(rows=2, cols=1,
+                            subplot_titles=("Change Coef. in std sediment concentration for each 1% in forest loss",
+                                            "Mean Monthly Precipitation"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=slopes_df.index,
+                y=slopes_df.iloc[:, 0].tolist(),
+                name='slopes',
+                mode='markers',
+                line=dict(color="green")
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=[slopes_df.index[0], slopes_df.index[len(slopes_df.index)-1]],
+                y=[0, 0],
+                mode='lines',
+                name='',
+                line=dict(color='black')
+            ),
+            row=1, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=1, col=1)
+        fig.update_yaxes(title_text="Slope", autorange=True, row=1, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=mean_monthly_precipitation_df.index,
+                y=mean_monthly_precipitation_df.iloc[:, 0].tolist(),
+                name='Precipitation',
+                marker_color='blue'
+            ),
+            row=2, col=1
+        )
+
+        fig.update_xaxes(title_text="Months", row=2, col=1)
+        fig.update_yaxes(title_text="Precipitation (mm)", autorange=True, row=2, col=1)
+
+        fig.update_layout(showlegend=False)
+
+        chart_obj = PlotlyView(go.Figure(fig))
 
         context = {
             'gizmo_object': chart_obj,

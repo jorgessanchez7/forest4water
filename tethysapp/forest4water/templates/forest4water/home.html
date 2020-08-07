@@ -46,7 +46,7 @@
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a id="observed_tab_link" href="#observed" aria-controls="observed" role="tab" data-toggle="tab">Observed</a></li>
             <li role="presentation"><a id="monthlyAnalysis_tab_link" href="#monthlyAnalysis" aria-controls="monthlyAnalysis" role="tab" data-toggle="tab">Monthly Analysis</a></li>
-            <li role="presentation"><a id="annualAnalysis_tab_link" href="#annualAnalysis" aria-controls="annualAnalysis" role="tab" data-toggle="tab">Annual Analysis</a></li>
+            <li role="presentation"><a id="effects_tab_link" href="#effects" aria-controls="effects" role="tab" data-toggle="tab">Effects</a></li>
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
@@ -92,13 +92,21 @@
                 </div>
               </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="annualAnalysis">
+            <div role="tabpanel" class="tab-pane" id="effects">
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <div class="flex-container-row"><img id="annual-loading-Q-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
-                  <div id="annual-chart-Q-FC"></div>
-                  <div class="flex-container-row"><img id="annual-loading-S-FC" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
-                  <div id="annual-chart-S-FC"></div>
+                  <div class="flex-container-row"><img id="effect-mean-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-mean-chart-Q"></div>
+                  <div class="flex-container-row"><img id="effect-std-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-std-chart-Q"></div>
+                  <div class="flex-container-row"><img id="effect-max-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-max-chart-Q"></div>
+                  <div class="flex-container-row"><img id="effect-min-loading-Q" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-min-chart-Q"></div>
+                  <div class="flex-container-row"><img id="effect-mean-loading-S" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-mean-chart-S"></div>
+                  <div class="flex-container-row"><img id="effect-std-loading-S" class="view-file hidden" src="{% static 'forest4water/images/loader.gif' %}" /></div>
+                  <div id="effect-std-chart-S"></div>
                 </div>
               </div>
             </div>
