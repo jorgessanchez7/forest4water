@@ -34,6 +34,10 @@ function init_map() {
 			zoom: 5
 		})
 	});
+
+	stations.getSource().on('addfeature', function(e) {
+			map.getView().fit(stations.getSource().getExtent());
+	});
 }
 
 let ajax_url = 'https://multi-tethys.byu.edu/geoserver/forest4water/wfs?request=GetCapabilities';
@@ -66,6 +70,9 @@ let capabilities = $.ajax(ajax_url, {
 		let extent = ol.proj.transform([minx, miny], 'EPSG:4326', 'EPSG:3857').concat(ol.proj.transform([maxx, maxy], 'EPSG:4326', 'EPSG:3857'));
 
 		console.log(extent)
+
+
+
 		map.getView().fit(extent, map.getSize());
 	}
 });
@@ -85,6 +92,10 @@ function add_layer_map(stationcode) {
 	});
 
 	map.addLayer(basin);
+
+	basin.getSource().on('addfeature', function(e) {
+			map.getView().fit(stations.getSource().getExtent());
+	});
 
 	let ajax_url = 'https://multi-tethys.byu.edu/geoserver/forest4water/wfs?request=GetCapabilities';
 

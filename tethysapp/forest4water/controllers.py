@@ -1075,7 +1075,7 @@ def get_monthly_max_discharge_data(request):
             y=df1.iloc[:,0].tolist(),
             name='max January',
             mode='lines+markers',
-            marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
+            #marker_size=(0.015 * df1.iloc[:, 1]).tolist(),
             line=dict(color="rgb(141,211,199)")
         )
 
