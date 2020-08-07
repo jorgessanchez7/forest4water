@@ -60,9 +60,19 @@ class Forest4Water(TethysAppBase):
 	            controller='forest4water.controllers.get_monthly_mean_discharge_data'
             ),
             UrlMap(
+	            name='get_monthly_mean_trend_discharge_data',
+	            url='get-monthly-mean-trend-discharge-data',
+	            controller='forest4water.controllers.get_monthly_mean_trend_discharge_data'
+            ),
+            UrlMap(
                 name='get_monthly_std_discharge_data',
                 url='get-monthly-std-discharge-data',
                 controller='forest4water.controllers.get_monthly_std_discharge_data'
+            ),
+            UrlMap(
+	            name='get_monthly_std_trend_discharge_data',
+	            url='get-monthly-std-trend-discharge-data',
+	            controller='forest4water.controllers.get_monthly_std_trend_discharge_data'
             ),
             UrlMap(
 	            name='get_monthly_max_discharge_data',
@@ -70,9 +80,19 @@ class Forest4Water(TethysAppBase):
 	            controller='forest4water.controllers.get_monthly_max_discharge_data'
             ),
             UrlMap(
+	            name='get_monthly_max_trend_discharge_data',
+	            url='get-monthly-max-trend-discharge-data',
+	            controller='forest4water.controllers.get_monthly_max_trend_discharge_data'
+            ),
+            UrlMap(
 	            name='get_monthly_min_discharge_data',
 	            url='get-monthly-min-discharge-data',
 	            controller='forest4water.controllers.get_monthly_min_discharge_data'
+            ),
+            UrlMap(
+	            name='get_monthly_min_trend_discharge_data',
+	            url='get-monthly-min-trend-discharge-data',
+	            controller='forest4water.controllers.get_monthly_min_trend_discharge_data'
             ),
             UrlMap(
 	            name='get_monthly_mean_sediments_data',

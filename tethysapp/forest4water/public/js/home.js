@@ -98,9 +98,13 @@ function map_events() {
 				$('#observed-chart-P').addClass('hidden');
 				$('#observed-chart-FC').addClass('hidden');
 				$('#mean-chart-Q').addClass('hidden');
+				$('#mean-trend-chart-Q').addClass('hidden');
 				$('#std-chart-Q').addClass('hidden');
+				$('#std-trend-chart-Q').addClass('hidden');
 				$('#max-chart-Q').addClass('hidden');
+				$('#max-trend-chart-Q').addClass('hidden');
 				$('#min-chart-Q').addClass('hidden');
+				$('#min-trend-chart-Q').addClass('hidden');
 				$('#mean-chart-S').addClass('hidden');
 				$('#std-chart-S').addClass('hidden');
 				$('#annual-chart-Q-FC').addClass('hidden');
@@ -111,9 +115,13 @@ function map_events() {
 				$('#observed-loading-P').removeClass('hidden');
 				$('#observed-loading-FC').removeClass('hidden');
 				$('#mean-loading-Q').removeClass('hidden');
+				$('#mean-trend-loading-Q').removeClass('hidden');
 				$('#std-loading-Q').removeClass('hidden');
+				$('#std-trend-loading-Q').removeClass('hidden');
 				$('#max-loading-Q').removeClass('hidden');
+				$('#max-trend-loading-Q').removeClass('hidden');
 				$('#min-loading-Q').removeClass('hidden');
+				$('#min-trend-loading-Q').removeClass('hidden');
 				$('#mean-loading-S').removeClass('hidden');
 				$('#std-loading-S').removeClass('hidden');
 				$('#annual-loading-Q-FC').removeClass('hidden');
@@ -138,9 +146,13 @@ function map_events() {
                         get_precipitation_info (stationcode, stationname);
                         get_forest_cover_info (stationcode, stationname);
                         get_monthly_mean_discharge_data (stationcode, stationname);
+                        get_monthly_mean_trend_discharge_data (stationcode, stationname);
                         get_monthly_std_discharge_data (stationcode, stationname);
+                        get_monthly_std_trend_discharge_data (stationcode, stationname);
                         get_monthly_max_discharge_data (stationcode, stationname);
+                        get_monthly_max_trend_discharge_data (stationcode, stationname);
                         get_monthly_min_discharge_data (stationcode, stationname);
+                        get_monthly_min_trend_discharge_data (stationcode, stationname);
                         get_monthly_mean_sediments_data (stationcode, stationname);
                         get_monthly_std_sediments_data (stationcode, stationname);
                         get_scatterPlot_Q_FC (stationcode, stationname);
@@ -417,6 +429,50 @@ function get_monthly_mean_discharge_data (stationcode, stationname) {
     });
 };
 
+function get_monthly_mean_trend_discharge_data (stationcode, stationname) {
+	$('#mean-trend-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-monthly-mean-trend-discharge-data',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#mean-trend-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#mean-trend-chart-Q').removeClass('hidden');
+                $('#mean-trend-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#mean-trend-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#mean-trend-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
 function get_monthly_std_discharge_data (stationcode, stationname) {
 	$('#std-loading-Q').removeClass('hidden');
     $.ajax({
@@ -442,6 +498,50 @@ function get_monthly_std_discharge_data (stationcode, stationname) {
                 //resize main graph
                 Plotly.Plots.resize($("#std-chart-Q .js-plotly-plot")[0]);
                 Plotly.relayout($("#std-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_monthly_std_trend_discharge_data (stationcode, stationname) {
+	$('#std-trend-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-monthly-std-trend-discharge-data',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#std-trend-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#std-trend-chart-Q').removeClass('hidden');
+                $('#std-trend-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#std-trend-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#std-trend-chart-Q .js-plotly-plot")[0], {
                 	'xaxis.autorange': true,
                 	'yaxis.autorange': true
                 });
@@ -505,6 +605,50 @@ function get_monthly_max_discharge_data (stationcode, stationname) {
     });
 };
 
+function get_monthly_max_trend_discharge_data (stationcode, stationname) {
+	$('#max-trend-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-monthly-max-trend-discharge-data',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#max-trend-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#max-trend-chart-Q').removeClass('hidden');
+                $('#max-trend-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#max-trend-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#max-trend-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
 function get_monthly_min_discharge_data (stationcode, stationname) {
 	$('#min-loading-Q').removeClass('hidden');
     $.ajax({
@@ -530,6 +674,50 @@ function get_monthly_min_discharge_data (stationcode, stationname) {
                 //resize main graph
                 Plotly.Plots.resize($("#min-chart-Q .js-plotly-plot")[0]);
                 Plotly.relayout($("#min-chart-Q .js-plotly-plot")[0], {
+                	'xaxis.autorange': true,
+                	'yaxis.autorange': true
+                });
+
+            } else if (data.error) {
+            	$('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the Observed Discharge Data</strong></p>');
+            	$('#info').removeClass('hidden');
+
+            	setTimeout(function() {
+            		$('#info').addClass('hidden')
+                }, 5000);
+
+            } else {
+            	$('#info').html('<p><strong>An unexplainable error occurred.</strong></p>').removeClass('hidden');
+            }
+        }
+    });
+};
+
+function get_monthly_min_trend_discharge_data (stationcode, stationname) {
+	$('#min-trend-loading-Q').removeClass('hidden');
+    $.ajax({
+        url: 'get-monthly-min-trend-discharge-data',
+        type: 'GET',
+        data: {'stationcode' : stationcode, 'stationname': stationname},
+        error: function () {
+            $('#info').html('<p class="alert alert-danger" style="text-align: center"><strong>An unknown error occurred while retrieving the observed discharge data</strong></p>');
+            $('#info').removeClass('hidden');
+
+            setTimeout(function () {
+                $('#info').addClass('hidden')
+            }, 5000);
+        },
+        success: function (data) {
+            if (!data.error) {
+                $('#min-trend-loading-Q').addClass('hidden');
+                $('#dates').removeClass('hidden');
+                $loading.addClass('hidden');
+                $('#min-trend-chart-Q').removeClass('hidden');
+                $('#min-trend-chart-Q').html(data);
+
+                //resize main graph
+                Plotly.Plots.resize($("#min-trend-chart-Q .js-plotly-plot")[0]);
+                Plotly.relayout($("#min-trend-chart-Q .js-plotly-plot")[0], {
                 	'xaxis.autorange': true,
                 	'yaxis.autorange': true
                 });
@@ -760,8 +948,18 @@ function resize_graphs() {
         	'xaxis.autorange': true,
         	'yaxis.autorange': true
         });
+        Plotly.Plots.resize($("#mean-trend-chart-Q .js-plotly-plot")[0]);
+        Plotly.relayout($("#mean-trend-chart-Q .js-plotly-plot")[0], {
+        	'xaxis.autorange': true,
+        	'yaxis.autorange': true
+        });
         Plotly.Plots.resize($("#std-chart-Q .js-plotly-plot")[0]);
         Plotly.relayout($("#std-chart-Q .js-plotly-plot")[0], {
+        	'xaxis.autorange': true,
+        	'yaxis.autorange': true
+        });
+        Plotly.Plots.resize($("#std-trend-chart-Q .js-plotly-plot")[0]);
+        Plotly.relayout($("#std-trend-chart-Q .js-plotly-plot")[0], {
         	'xaxis.autorange': true,
         	'yaxis.autorange': true
         });
@@ -770,8 +968,18 @@ function resize_graphs() {
         	'xaxis.autorange': true,
         	'yaxis.autorange': true
         });
+        Plotly.Plots.resize($("#max-trend-chart-Q .js-plotly-plot")[0]);
+        Plotly.relayout($("#max-trend-chart-Q .js-plotly-plot")[0], {
+        	'xaxis.autorange': true,
+        	'yaxis.autorange': true
+        });
         Plotly.Plots.resize($("#min-chart-Q .js-plotly-plot")[0]);
         Plotly.relayout($("#min-chart-Q .js-plotly-plot")[0], {
+        	'xaxis.autorange': true,
+        	'yaxis.autorange': true
+        });
+        Plotly.Plots.resize($("#min-trend-chart-Q .js-plotly-plot")[0]);
+        Plotly.relayout($("#min-trend-chart-Q .js-plotly-plot")[0], {
         	'xaxis.autorange': true,
         	'yaxis.autorange': true
         });
